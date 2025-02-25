@@ -2,22 +2,16 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for root.
 GH_REPO="https://github.com/root-project/root"
 TOOL_NAME="root"
 TOOL_TEST="root --version"
+
+curl_opts=(-fsSL)
 
 fail() {
 	echo -e "asdf-$TOOL_NAME: $*"
 	exit 1
 }
-
-curl_opts=(-fsSL)
-
-# NOTE: You might want to remove this if root is not hosted on GitHub releases.
-if [ -n "${GITHUB_API_TOKEN:-}" ]; then
-	curl_opts=("${curl_opts[@]}" -H "Authorization: token $GITHUB_API_TOKEN")
-fi
 
 sort_versions() {
 	sed 'h; s/[+-]/./g; s/.p\([[:digit:]]\)/.z\1/; s/$/.z/; G; s/\n/ /' |
@@ -27,48 +21,68 @@ sort_versions() {
 list_github_tags() {
 	git ls-remote --tags --refs "$GH_REPO" |
 		grep -o 'refs/tags/.*' | cut -d/ -f3- |
-		sed 's/^v//' # NOTE: You might want to adapt this sed to remove non-version strings from tags
+		sed 's/^v//'
 }
 
 list_all_versions() {
-	# TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-	# Change this function if root has other means of determining installable versions.
 	list_github_tags
 }
 
 download_release() {
-	local version filename url
-	version="$1"
-	filename="$2"
-
-	# TODO: Adapt the release URL convention for root
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	local version="$1"
 
 	echo "* Downloading $TOOL_NAME release $version..."
-	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
+	git clone --branch v${version} --depth=1 https://github.com/root-project/root.git $ASDF_DOWNLOAD_PATH
 }
 
 install_version() {
 	local install_type="$1"
 	local version="$2"
-	local install_path="${3%/bin}/bin"
+	local install_path="${3%/bin}"
+	local base_path="/tmp/asdf-root/root-build"
+	local build_root="${base_path}/build_root"
+	local install_prefix="${base_path}/install_prefix"
 
 	if [ "$install_type" != "version" ]; then
 		fail "asdf-$TOOL_NAME supports release installs only"
 	fi
 
 	(
+		mkdir -p "$build_root"
+		mkdir -p "$install_prefix"
 		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
-		# TODO: Assert root executable exists.
-		local tool_cmd
-		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
-		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
+		# Build
+		local n_cores_build=$(($(nproc --all)-1))
+		cmake -S "$ASDF_DOWNLOAD_PATH" -B "$build_root" -DCMAKE_INSTALL_PREFIX=${install_prefix}
+		cmake --build "$build_root" --target install -j${n_cores_build}
 
-		echo "$TOOL_NAME $version installation was successful!"
+		# Copy build files to final destination
+		cp -r "$install_prefix"/* "$install_path"
+
+		# Remove build files
+		rm -rf "$base_path"
+
+		# Assert thisroot exists.
+		local thisroot="${install_path}/bin/thisroot.sh"
+		if [ ! -e "$thisroot" ]; then
+			fail "Expected to find $thisroot."
+		fi
+
+		# Assert root is executable
+		local tool_executable="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+		local tool_cmd="${install_path}/bin/${tool_executable}"
+		test -x "$tool_cmd" || fail "Expected $tool_cmd to be executable."
+
+		# Instruct user to source thisroot.sh in his shell
+		echo "${TOOL_NAME} installed.\n"
+		echo "You'll have to source ${thisroot} in you shell to access root."
+		echo "You can test ${TOOL_NAME} using ${TOOL_TEST}"
+
 	) || (
 		rm -rf "$install_path"
+		rm -rf "$base_path"
+		rm -rf "$ASDF_DOWNLOAD_PATH"
 		fail "An error occurred while installing $TOOL_NAME $version."
 	)
 }
