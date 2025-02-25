@@ -15,18 +15,14 @@
 
 # Dependencies
 
-**TODO: adapt this section**
-
-- `bash`, `curl`, `tar`, and [POSIX utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html).
-- `SOME_ENV_VAR`: set this environment variable in your shell config to load the correct version of tool x.
+- `bash`, `curl`, `cmake`, `nproc` and [POSIX utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html).
+- [ROOT's dependencies](https://root.cern/install/dependencies/)
 
 # Install
 
 Plugin:
 
 ```shell
-asdf plugin add root
-# or
 asdf plugin add root https://github.com/gabrielmscampos/asdf-root.git
 ```
 
@@ -40,7 +36,7 @@ asdf list-all root
 asdf install root latest
 
 # Set a version globally (on your ~/.tool-versions file)
-asdf global root latest
+asdf set --home root latest
 
 # Now root commands are available
 root --version
@@ -48,6 +44,35 @@ root --version
 
 Check [asdf](https://github.com/asdf-vm/asdf) readme for more instructions on how to
 install & manage versions.
+
+Check [root](https://root.cern/install/) website for more instruction on how to install ROOT.
+
+# Install same ROOT version + multiple python versions
+
+When compiling ROOT from scratch (as this plugin does), it automatically detects the current Python installation. However, you cannot install the same ROOT version multiple times using asdf. If you need the same ROOT version with different Python versions, you'll have to duplicate the installation under a different "plugin" name and then reinstall ROOT for the desired Python version.
+
+**Example: Installing ROOT v6-32-10 for Python 3.10.X and 3.9.X**
+
+```shell
+# Install Python
+asdf plugin add python
+asdf install python 3.10.13
+asdf install python 3.9.19
+
+# Let's first setup ROOT for python 3.10.X
+asdf set python 3.10.13
+asdf plugin add root-python310 https://github.com/gabrielmscampos/asdf-root.git
+asdf plugin install root-python310 6-32-10
+asdf set root-python310 6-32-10
+
+# Now setup ROOT for python 3.9.X
+asdf set python 3.9.19
+asdf plugin add root-python39 https://github.com/gabrielmscampos/asdf-root.git
+asdf plugin install root-python39 6-32-10
+asdf set root-python39 6-32-10
+```
+
+This approach ensures that you can use ROOT v6-32-10 with both Python 3.10 and 3.9 by managing separate plugin names for each Python version.
 
 # Contributing
 
