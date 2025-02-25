@@ -62,13 +62,13 @@ asdf install python 3.9.19
 # Let's first setup ROOT for python 3.10.X
 asdf set python 3.10.13
 asdf plugin add root-python310 https://github.com/gabrielmscampos/asdf-root.git
-asdf plugin install root-python310 6-32-10
+asdf install root-python310 6-32-10
 asdf set root-python310 6-32-10
 
 # Now setup ROOT for python 3.9.X
 asdf set python 3.9.19
 asdf plugin add root-python39 https://github.com/gabrielmscampos/asdf-root.git
-asdf plugin install root-python39 6-32-10
+asdf install root-python39 6-32-10
 asdf set root-python39 6-32-10
 ```
 
