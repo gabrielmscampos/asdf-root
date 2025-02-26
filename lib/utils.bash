@@ -52,7 +52,8 @@ install_version() {
 
 		# Build
 		local n_cores_build=$(($(nproc --all) - 1))
-		cmake -S "$ASDF_DOWNLOAD_PATH" -B "$build_root" -DCMAKE_INSTALL_PREFIX=${install_prefix}
+		local build_flags=${ROOT_BUILD_FLAGS:-""}
+		cmake -S "$ASDF_DOWNLOAD_PATH" -B "$build_root" -DCMAKE_INSTALL_PREFIX=${install_prefix} ${build_flags}
 		cmake --build "$build_root" --target install -j${n_cores_build}
 
 		# Copy build files to final destination
