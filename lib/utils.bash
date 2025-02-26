@@ -75,9 +75,22 @@ install_version() {
 		test -x "$tool_cmd" || fail "Expected $tool_cmd to be executable."
 
 		# Instruct user to source thisroot.sh in his shell
-		echo "${TOOL_NAME} installed.\n"
-		echo "You'll have to source ${thisroot} in you shell to access root."
-		echo "You can test ${TOOL_NAME} using ${TOOL_TEST}"
+		echo
+		echo "${TOOL_NAME} (version ${version}) is installed now."
+		echo
+		echo "To get started it is recommended to configure your shell to source thisroot script."
+		echo "${TOOL_NAME} will launch without sourcing it, however python bindings will not work."
+		echo "You can do this by adding this to your shell (.bash, .zshrc):"
+		echo
+		echo "source ${thisroot}"
+		echo
+		echo "To confirm that ${TOOL_NAME} was installed correctly, you can run:"
+		echo
+		echo "${TOOL_TEST}"
+		echo
+		echo "To confirm that python bindings are working, you can run:"
+		echo
+		echo "python -c 'import ROOT'"
 
 	) || (
 		rm -rf "$install_path"
