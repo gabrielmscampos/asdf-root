@@ -18,7 +18,7 @@
 - `bash`, `curl`, `cmake`, `nproc` and [POSIX utilities](https://pubs.opengroup.org/onlinepubs/9699919799/idx/utilities.html).
 - [ROOT's dependencies](https://root.cern/install/dependencies/)
 
-# Install
+# Simple install
 
 Plugin:
 
@@ -47,7 +47,7 @@ install & manage versions.
 
 Check [root](https://root.cern/install/) website for more instruction on how to install ROOT.
 
-# Install same ROOT version + multiple python versions
+# Install ROOT for multiple python versions
 
 When compiling ROOT from scratch (as this plugin does), it automatically detects the current Python installation. However, you cannot install the same ROOT version multiple times using asdf. If you need the same ROOT version with different Python versions, you'll have to duplicate the installation under a different "plugin" name and then reinstall ROOT for the desired Python version.
 
