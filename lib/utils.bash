@@ -6,8 +6,6 @@ GH_REPO="https://github.com/root-project/root"
 TOOL_NAME="root"
 TOOL_TEST="root --version"
 
-curl_opts=(-fsSL)
-
 fail() {
 	echo -e "asdf-$TOOL_NAME: $*"
 	exit 1
@@ -32,7 +30,7 @@ download_release() {
 	local version="$1"
 
 	echo "* Downloading $TOOL_NAME release $version..."
-	git clone --branch v${version} --depth=1 https://github.com/root-project/root.git $ASDF_DOWNLOAD_PATH
+	git clone --branch "v${version}" --depth=1 https://github.com/root-project/root.git "$ASDF_DOWNLOAD_PATH"
 }
 
 install_version() {
@@ -53,7 +51,7 @@ install_version() {
 		mkdir -p "$install_path"
 
 		# Build
-		local n_cores_build=$(($(nproc --all)-1))
+		local n_cores_build=$(($(nproc --all) - 1))
 		cmake -S "$ASDF_DOWNLOAD_PATH" -B "$build_root" -DCMAKE_INSTALL_PREFIX=${install_prefix}
 		cmake --build "$build_root" --target install -j${n_cores_build}
 
@@ -70,8 +68,9 @@ install_version() {
 		fi
 
 		# Assert root is executable
-		local tool_executable="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
-		local tool_cmd="${install_path}/bin/${tool_executable}"
+		local tool_executable, tool_cmd
+		tool_executable="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
+		tool_cmd="${install_path}/bin/${tool_executable}"
 		test -x "$tool_cmd" || fail "Expected $tool_cmd to be executable."
 
 		# Instruct user to source thisroot.sh in his shell
