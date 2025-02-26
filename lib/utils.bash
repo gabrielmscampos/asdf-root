@@ -69,7 +69,7 @@ install_version() {
 		fi
 
 		# Assert root is executable
-		local tool_executable, tool_cmd
+		local tool_executable tool_cmd
 		tool_executable="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
 		tool_cmd="${install_path}/bin/${tool_executable}"
 		test -x "$tool_cmd" || fail "Expected $tool_cmd to be executable."
