@@ -45,7 +45,7 @@ root --version
 Check [asdf](https://github.com/asdf-vm/asdf) readme for more instructions on how to
 install & manage versions.
 
-Check [root](https://root.cern/install/) website for more instruction on how to install ROOT.
+Check [root](https://root.cern/install/) website for more instructions on how to install ROOT.
 
 # Install ROOT for multiple python versions
 
