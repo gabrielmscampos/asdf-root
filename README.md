@@ -74,6 +74,19 @@ asdf set root-python39 6-32-10
 
 This approach ensures that you can use ROOT v6-32-10 with both Python 3.10 and 3.9 by managing separate plugin names for each Python version.
 
+# Install ROOT with optional build flags
+
+Optional flags can be passed to the build process using the `ROOT_BUILD_FLAGS` environment variable.
+
+**Example: Building ROOT with CUDA support**
+
+```shell
+asdf plugin add root https://github.com/gabrielmscampos/asdf-root.git
+ROOT_BUILD_FLAGS="-Dcuda=ON -Dcudnn=ON -Dtmva-gpu=ON" asdf install root 6-30-02
+```
+
+Check [building ROOT from source](https://root.cern/install/build_from_source/) website for more instructions on build flags.
+
 # Contributing
 
 Contributions of any kind welcome! See the [contributing guide](contributing.md).
